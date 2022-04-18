@@ -1,29 +1,53 @@
 import type { NextPage } from "next";
 import Input from "../components/input";
 import Button from "../components/botton";
-import { useState } from "react";
+import React, { useState } from "react";
 import { cls } from "../libs/client/utils";
 import { useForm } from "react-hook-form";
 
 interface EnterForm {
   email?: string;
   phone?: string;
+  team: string;
 }
 
 const Enter: NextPage = () => {
+  const Team = ["토트넘", "첼시", "아스날", "아스톤빌라"]; //테스트
   const [method, setMethod] = useState<"email" | "phone">("email");
+  const [teamList, setTeamList] = useState(true);
+  const [teamInput, setTeamInput] = useState("");
+  const [seachResult, setSearchResult] = useState(Team);
   const { register, handleSubmit, reset } = useForm<EnterForm>();
+
   const onEmailClick = () => {
     reset();
     setMethod("email");
   };
+
   const onPhoneClick = () => {
     reset();
     setMethod("phone");
   };
+
   const onValid = (validForm: EnterForm) => {
     console.log(validForm);
   };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTeamList(true);
+    setTeamInput(e.target.value);
+    const result = Team.filter((team) => {
+      return team.includes(e.target.value);
+    });
+    setSearchResult(result);
+  };
+
+  const handleSearchClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    //setTeamInput((e.target as HTMLDivElement).textContent); //오류발생
+    setTeamList(false);
+  };
+
   return (
     <div className='mt-16 px-4'>
       <h3 className='text-white text-3xl font-bold text-center tracking-wide'>
@@ -82,6 +106,17 @@ const Enter: NextPage = () => {
                 required
               />
             ) : null}
+            <Input
+              register={register("team", {
+                required: true,
+              })}
+              name='team'
+              type='team'
+              kind='team'
+              onChange={handleSearch}
+              value={teamInput}
+              required
+            />
             <Button text={"START"} />
           </form>
         </>
