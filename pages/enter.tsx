@@ -4,6 +4,7 @@ import Button from "../components/botton";
 import React, { useState } from "react";
 import { cls } from "../libs/client/utils";
 import { useForm } from "react-hook-form";
+import TeamSearchResult from "../components/TeamSearchResult";
 
 interface EnterForm {
   email?: string;
@@ -15,8 +16,8 @@ const Enter: NextPage = () => {
   const Team = ["토트넘", "첼시", "아스날", "아스톤빌라"]; //테스트
   const [method, setMethod] = useState<"email" | "phone">("email");
   const [teamList, setTeamList] = useState(true);
-  const [teamInput, setTeamInput] = useState("");
-  const [seachResult, setSearchResult] = useState(Team);
+  const [teamInput, setTeamInput] = useState<string | null>("");
+  const [searchResult, setSearchResult] = useState(Team);
   const { register, handleSubmit, reset } = useForm<EnterForm>();
 
   const onEmailClick = () => {
@@ -44,7 +45,7 @@ const Enter: NextPage = () => {
 
   const handleSearchClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    //setTeamInput((e.target as HTMLDivElement).textContent); //오류발생
+    setTeamInput((e.target as HTMLDivElement).textContent);
     setTeamList(false);
   };
 
@@ -117,6 +118,12 @@ const Enter: NextPage = () => {
               value={teamInput}
               required
             />
+            {teamInput && teamList && (
+              <TeamSearchResult
+                teams={searchResult}
+                handleSearchClick={handleSearchClick}
+              />
+            )}
             <Button text={"START"} />
           </form>
         </>

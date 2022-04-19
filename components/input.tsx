@@ -7,7 +7,7 @@ interface InputProps {
   type: string;
   register: UseFormRegisterReturn;
   required: boolean;
-  value?: string;
+  value?: any;
   onChange?: any;
 }
 
@@ -43,7 +43,7 @@ export default function Input({
             {...register}
             onChange={onChange}
             value={value}
-            placeholder='팀 선택'
+            placeholder='팀 검색'
             className='appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-600 focus:border-pink-600'
           />
         </div>
