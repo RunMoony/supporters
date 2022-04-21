@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Input from "../components/input";
 import Button from "../components/botton";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { cls } from "../libs/client/utils";
 import { useForm } from "react-hook-form";
 import TeamSearchResult from "../components/TeamSearchResult";
@@ -11,7 +11,7 @@ interface EnterForm {
   phone?: string;
   team: string;
 }
-
+//추후에 팀선택 Input focus 기능 수정하기
 const Enter: NextPage = () => {
   const Team = ["토트넘", "첼시", "아스날", "아스톤빌라"]; //테스트
   const [method, setMethod] = useState<"email" | "phone">("email");
@@ -19,6 +19,7 @@ const Enter: NextPage = () => {
   const [teamInput, setTeamInput] = useState<string | null>("");
   const [searchResult, setSearchResult] = useState(Team);
   const { register, handleSubmit, reset } = useForm<EnterForm>();
+  //const teamInputFocus = useRef<HTMLInputElement | null>(null);
 
   const onEmailClick = () => {
     reset();
@@ -46,6 +47,7 @@ const Enter: NextPage = () => {
   const handleSearchClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     setTeamInput((e.target as HTMLDivElement).textContent);
+    //teamInputFocus.current?.focus();
     setTeamList(false);
   };
 
