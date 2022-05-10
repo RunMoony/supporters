@@ -69,8 +69,8 @@ export const teamList: teamListTypes = [
       },
       {
         teamId: 8668,
-        teamNameLong: "Brentford",
-        teamName: "BRN",
+        teamNameLong: "Everton",
+        teamName: "EVT",
         teamColor: "#e30613",
         teamSubColor: "#f7f7f7",
       },
