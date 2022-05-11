@@ -1,59 +1,40 @@
 import type { NextPage } from "next";
-import Input from "../components/input";
 import Button from "../components/botton";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { cls } from "../libs/client/utils";
-import { useForm } from "react-hook-form";
-import TeamSearchResult from "../components/TeamSearchResult";
+import useMutation from "../libs/client/useMutation";
+import "antd/dist/antd.css";
+import { Avatar, Select, Form, Input } from "antd";
+import { teamList } from "../data/teamList";
 
+interface MutationResult {
+  ok: boolean;
+}
 interface EnterForm {
   email?: string;
   phone?: string;
-  team: string;
+  team: Number;
 }
-//추후에 팀선택 Input focus 기능 수정하기
 const Enter: NextPage = () => {
-  const Team = ["토트넘", "첼시", "아스날", "아스톤빌라"]; //테스트
+  const [enter, { loading, data, error }] =
+    useMutation<MutationResult>("/api/users/enter");
   const [method, setMethod] = useState<"email" | "phone">("email");
-  const [teamList, setTeamList] = useState(true);
-  const [teamInput, setTeamInput] = useState<string | null>("");
-  const [searchResult, setSearchResult] = useState(Team);
-  const { register, handleSubmit, reset } = useForm<EnterForm>();
-  //const teamInputFocus = useRef<HTMLInputElement | null>(null);
 
   const onEmailClick = () => {
-    reset();
     setMethod("email");
   };
 
   const onPhoneClick = () => {
-    reset();
     setMethod("phone");
   };
 
-  const onValid = (validForm: EnterForm) => {
-    console.log(validForm);
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTeamList(true);
-    setTeamInput(e.target.value);
-    const result = Team.filter((team) => {
-      return team.includes(e.target.value);
-    });
-    setSearchResult(result);
-  };
-
-  const handleSearchClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setTeamInput((e.target as HTMLDivElement).textContent);
-    //teamInputFocus.current?.focus();
-    setTeamList(false);
+  const onValid = (values: EnterForm) => {
+    console.log(values);
   };
 
   return (
     <div className='mt-16 px-4'>
-      <h3 className='text-white text-3xl font-bold text-center tracking-wide'>
+      <h3 className='text-pink-600 text-3xl font-bold text-center tracking-wide'>
         SUPPORTERS
       </h3>
       <div className='mt-12'>
@@ -65,7 +46,7 @@ const Enter: NextPage = () => {
                   "pb-4 font-medium text-sm border-b-2",
                   method === "email"
                     ? " border-pink-600 text-pink-600"
-                    : "border-transparent hover:text-white text-white"
+                    : "border-transparent hover:text-black text-black"
                 )}
                 onClick={onEmailClick}
               >
@@ -76,7 +57,7 @@ const Enter: NextPage = () => {
                   "pb-4 font-medium text-sm border-b-2",
                   method === "phone"
                     ? " border-pink-600 text-pink-600"
-                    : "border-transparent hover:text-white text-white"
+                    : "border-transparent hover:text-black text-black"
                 )}
                 onClick={onPhoneClick}
               >
@@ -84,57 +65,88 @@ const Enter: NextPage = () => {
               </button>
             </div>
           </div>
-          <form
-            onSubmit={handleSubmit(onValid)}
-            className='flex flex-col mt-8 space-y-4'
+          <Form
+            autoComplete='off'
+            onFinish={onValid}
+            style={{ display: "flex", marginTop: 30 }}
+            className='flex flex-col space-y-4'
           >
             {method === "email" ? (
-              <Input
-                register={register("email", {
-                  required: true,
-                })}
+              <Form.Item
                 name='email'
-                type='email'
-                required
-              />
+                rules={[
+                  { required: true, message: "email을 입력해주세요." },
+                  {
+                    whitespace: true,
+                  },
+                  {
+                    type: "email",
+                    message: "이메일을 다시 확인해주세요.",
+                  },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder='Email을 입력해주세요.' size='large' />
+              </Form.Item>
             ) : null}
             {method === "phone" ? (
-              <Input
-                register={register("phone", {
-                  required: true,
-                })}
+              <Form.Item
                 name='phone'
-                type='number'
-                kind='phone'
-                required
-              />
+                rules={[
+                  { required: true, message: "번호를 입력해주세요." },
+                  {
+                    min: 13,
+                    max: 13,
+                    message: "번호를 다시 한번 확인해주세요.",
+                  },
+                  {
+                    whitespace: true,
+                  },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder='8201012345678' size='large' />
+              </Form.Item>
             ) : null}
-            <Input
-              register={register("team", {
-                required: true,
-              })}
+            <Form.Item
               name='team'
-              type='team'
-              kind='team'
-              onChange={handleSearch}
-              value={teamInput}
-              required
-            />
-            {teamInput && teamList && (
-              <TeamSearchResult
-                teams={searchResult}
-                handleSearchClick={handleSearchClick}
-              />
-            )}
+              rules={[{ required: true, message: "팀을 선택해주세요." }]}
+            >
+              <Select
+                size='large'
+                placeholder='팀을 선택해주세요.'
+                style={{ marginTop: -5 }}
+              >
+                {teamList.map((league) =>
+                  league.teams.map((team) => {
+                    return (
+                      <Select.Option
+                        key={team.teamId}
+                        value={team.teamId}
+                        style={{ padding: "10px" }}
+                      >
+                        <Avatar
+                          src={`https://images.fotmob.com/image_resources/logo/teamlogo/${team.teamId}_small.png`}
+                          size='small'
+                          style={{ marginRight: "15px" }}
+                        />
+                        {team.teamNameLong}
+                      </Select.Option>
+                    );
+                  })
+                )}
+              </Select>
+            </Form.Item>
+
             <Button text={"START"} />
-          </form>
+          </Form>
         </>
 
         <div className='mt-12'>
           <div className='relative'>
             <div className='absolute w-full border-t border-gray-300' />
             <div className='relative -top-3 text-center '>
-              <span className='bg-custom-purple px-2 text-sm text-white'>
+              <span className='bg-white px-2 text-sm text-black'>
                 다른 방법으로 로그인
               </span>
             </div>
